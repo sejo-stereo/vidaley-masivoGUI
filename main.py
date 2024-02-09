@@ -1,7 +1,6 @@
 import tkinter as tk
 import customtkinter
 from tkinter import filedialog
-
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -9,23 +8,19 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
-
 import pandas as pd
-
-from PIL import Image
-import requests
-from io import BytesIO
 
 customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme("dark-blue")
 
-url_vida_ley = "https://api-seguridad.sunat.gob.pe/v1/clientessol/b3639111-1546-4d06-b74f-de2c40629748/oauth2/login?originalUrl=https://apps.trabajo.gob.pe/si.segurovida/index.jsp&state=m1ntr4"
-chrome_options = Options()
-chrome_options.add_experimental_option("detach",True)
-driver = webdriver.Chrome(options=chrome_options)
-driver.implicitly_wait(3)
-driver.get(url_vida_ley)
-
+def start_chrome():
+    url_vida_ley = "https://api-seguridad.sunat.gob.pe/v1/clientessol/b3639111-1546-4d06-b74f-de2c40629748/oauth2/login?originalUrl=https://apps.trabajo.gob.pe/si.segurovida/index.jsp&state=m1ntr4"
+    chrome_options = Options()
+    chrome_options.add_experimental_option("detach",True)
+    driver = webdriver.Chrome(options=chrome_options)
+    driver.implicitly_wait(5)
+    driver.get(url_vida_ley)
+    return driver
 
 def seleccionar_excel():
     archivo = filedialog.askopenfilename(title="Seleccionar archivo", filetypes=(("Archivos de texto", "*.xlsx"), ("Todos los archivos", "*.*")))
@@ -33,22 +28,34 @@ def seleccionar_excel():
         print(f"seleccion: {archivo}")
         excel_label.configure(text=archivo)
     
+def eliminar_trabajador(dni):
+    driver.find_element(By.NAME,"v_codtrabus").clear()
+    driver.find_element(By.NAME,"v_codtrabus").send_keys(dni)
+    driver.find_element(By.XPATH,'//a[@href="javascript:buscarTraLisBD();"]').click()
+    try:
+        result_table = driver.find_element(By.XPATH,'//table[@id="lstPolizaTrabajador"]//tr/td[1]/input')
+        result_table.click()
+        driver.find_element(By.XPATH,'//img[@src="/si.segurovida/util/images/botones/eliminar.gif"]').click()
+        driver.switch_to.alert.accept()
+        return None
+    except NoSuchElementException:
+        # print(f"{dni}: No se encontro trabajador.")
+        return(f"{dni}: No se encontro trabajador.")
+
 def eliminar_trabajadores():
     ceses_df = pd.read_excel(excel_label.cget("text"),sheet_name="CESES",dtype={"NRO_DOC":str})
+    dni_error = []
     for i in range(len(ceses_df)):
         dni = ceses_df.loc[i,"NRO_DOC"]
-        driver.find_element(By.NAME,"v_codtrabus").clear()
-        driver.find_element(By.NAME,"v_codtrabus").send_keys(dni)
-        driver.find_element(By.XPATH,'//a[@href="javascript:buscarTraLisBD();"]').click()
-        try:
-            result_table = driver.find_element(By.XPATH,'//table[@id="lstPolizaTrabajador"]//tr/td[1]/input')
-            result_table.click()
-            driver.find_element(By.XPATH,'//img[@src="/si.segurovida/util/images/botones/eliminar.gif"]').click()
-            driver.switch_to.alert.accept()
-        except NoSuchElementException:
-            print(f"{dni}: No se encontro trabajador.")
-            with open("log_ceses.txt","a+") as f:
-                f.write(f"{dni}: No se encontro trabajador.\n")
+        dni_error.append(eliminar_trabajador(dni))
+    dni_error = [x for x in dni_error if x is not None]
+    if len(dni_error)>0:
+        with open("log_ceses.txt","w") as f:
+            f.write("\n".join(dni_error))
+    total_eliminar = len(ceses_df)
+    total_errores = len(dni_error)
+    total_eliminados = total_eliminar - total_errores
+    eliminados_label.configure(text=f"Total: {total_eliminar} - Eliminados: {total_eliminados} - Errores: {total_errores}")
 
 def agregar_trabajadores():
     ingresos_df = pd.read_excel(excel_label.cget("text"),sheet_name="INGRESOS",dtype={"NRO_DOC":str})
@@ -90,16 +97,10 @@ def agregar_trabajadores():
 def cerrar_chrome():
     driver.quit()
 
-def get_plin_image():
-    r = requests.get("https://i.ibb.co/fQX3QWj/img-plin.jpg")
-    if r.status_code == 200:
-        image = Image.open(BytesIO(r.content))
-        return image
-    else:
-        return None
+driver = start_chrome()
 
 app = customtkinter.CTk()
-app.geometry("560x700")
+app.geometry("450")
 app.title("MasivoVidaLey-v0.1.0")
 app.resizable(width=False,height=False)
 
@@ -115,21 +116,19 @@ select_file_button.pack(padx=10,pady=10)
 borrar_trabajador_button = customtkinter.CTkButton(app,text="2. Eliminar Trabajadores",command=eliminar_trabajadores)
 borrar_trabajador_button.pack(pady=10)
 
+eliminados_label = customtkinter.CTkLabel(app,text="Total: ## - Eliminados: ## - Errores: ##")
+eliminados_label.pack()
+
 agregar_trabajador_button = customtkinter.CTkButton(app,text="3. Agregar Trabajadores",command=agregar_trabajadores)
 agregar_trabajador_button.pack(pady=10)
 
 cerrar_chrome_button = customtkinter.CTkButton(app,text="Cerrar Chrome",command=cerrar_chrome)
 cerrar_chrome_button.pack(pady=10)
 
-plin_label = customtkinter.CTkLabel(app,text="Es una herramienta gratuita pero cualquier apoyo sera bienvenido :D")
-plin_label.pack(pady=10)
-
-# plin_img = customtkinter.CTkImage(light_image=Image.open("img_plin.jpeg"),dark_image=Image.open("img_plin.jpeg"),size=(200,235))
-plin_img = customtkinter.CTkImage(light_image=get_plin_image(),dark_image=get_plin_image(),size=(200,235))
-image_label = customtkinter.CTkLabel(app,image=plin_img,text="")
-image_label.pack(pady=10)
-
 info_label = customtkinter.CTkLabel(app,text="Cualquier duda o sugerencia pueden escribir por:\n Linkedin: https://www.linkedin.com/in/jose-melgarejo/ \n Correo: josemelgarejo88@gmail.com ")
 info_label.pack(pady=10)
 
 app.mainloop()
+
+
+
