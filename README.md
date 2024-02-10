@@ -4,7 +4,7 @@ Se creó una interfaz gráfica al registro de trabajadores al seguro de vida ley
 ![interfaz_vl](https://github.com/sejo-stereo/vidaley-masivoGUI/assets/51570964/05f3ab99-456f-437f-b62c-6491384454be)
 
 ## Instrucciones
-1. Descargar desde ***Releases*** el ejecutable.
+1. Descargar desde ***Releases*** el lanzamiento más nuevo.
 2. Descargar el archivo excel ***excel_demo.xlsx***.
 3. Completar el excel con la data necesaria y cerrarla antes de iniciar el programa.
    - INGRESOS: registrar todos los trabajadores que se darán de ALTA en la póliza.
