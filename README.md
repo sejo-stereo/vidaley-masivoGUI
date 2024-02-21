@@ -57,11 +57,11 @@ No debe registrar más líneas.
   
    La aplicación puede que deje de responder durante su ejecución pero seguirá con el registro en segundo plano. No apagar el equipo y aseguré buena conexión a internet.
 
-7. Si se proceso correctamente la alta/baja se mostrara la cantidad de trabajadores procesados y la cantidad de errores.
+7. Si se procesó correctamente la alta/baja se mostrará la cantidad de trabajadores procesados y la cantidad de errores.
 
 ![image](https://github.com/sejo-stereo/vidaley-masivoGUI/assets/51570964/7192213d-7502-4921-a37d-3cf295608c85)
 
-8. De presentar algún error no contemplado, el mensaje de error se mostrará en la ventana negra. Para reportar error envié una captura y una descripción a mi correo o Linkedin. Trataré de resolverlo en una siguiente actualización. 
+8. De presentar algún error no contemplado, el mensaje de error se mostrará en la ventana negra. Para reportar error envíe una captura y una descripción a mi correo o Linkedin. Trataré de resolverlo en una siguiente actualización. 
 
 ![image](https://github.com/sejo-stereo/vidaley-masivoGUI/assets/51570964/64d16b50-4cc7-49d3-bf45-712a6282281a)
 
