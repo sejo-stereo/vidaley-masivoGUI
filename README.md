@@ -2,6 +2,8 @@
 La aplicación **MasivoVidaLey** permite dar de alta y baja de trabajadores masivamente en el portal de REGISTRO OBLIGATORIO DE TRABAJADORES DEL SEGURO DE VIDA LEY.
 La aplicación cuenta con una interfaz gráfica para facilitar su uso.
 
+Video Explicación: https://www.youtube.com/watch?v=efqmRvPqcTo
+
 ![gui_image_1 0](https://github.com/sejo-stereo/vidaley-masivoGUI/assets/51570964/460f8f2c-96cf-46b8-a11b-0397236e33ef)
 
 ## Funciones
